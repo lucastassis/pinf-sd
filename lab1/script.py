@@ -4,38 +4,56 @@ from parallel_process_sort import parallel_process_sort
 from parallel_thread_sort import parallel_thread_sort
 import time
 
-array_sizes = [10, 100, 1000, 10000, 20000, 25000]
-n_divisions = [1, 2, 4, 8, 16]
+array_sizes = [64, 256, 1024, 8192, 65536, 262144, 1048576]
+n_divisions = [1, 2, 4, 8, 16, 32]
+
+process_time = []
+thread_time = []
 
 for n in n_divisions:
-    process_time = []
-    thread_time = []
+    process_temp = []
+    thread_temp = []
     
     for size in array_sizes:
         arr = generate_array(size=size)
         print(f'start process parallel for size={size}')
         # run process parallel and time it
         start = time.time()
-        process = parallel_process_sort(n_process=n, arr=arr)
+        process = parallel_process_sort(n_process=n, arr=arr, verbose=False)
         total = time.time() - start
-        process_time.append(total)
+        process_temp.append(total)
         print(f'finished process parallel in {total}s')
 
         # run thread parallel and time it
         print(f'start thread parallel for size={size}')
         start = time.time()
-        thread = parallel_thread_sort(n_thread=n, arr=arr)
+        thread = parallel_thread_sort(n_thread=n, arr=arr, verbose=False)
         total = time.time() - start
-        thread_time.append(total)
+        thread_temp.append(total)
         print(f'finished thread parallel in {total}s')
-        
-    fig, ax = plt.subplots(1, 1)
-    ax.plot(list(map(str, array_sizes)), process_time, label='process')
-    ax.plot(list(map(str, array_sizes)), thread_time, label='thread')
-    plt.xlabel('array size')
-    plt.ylabel('total time')
-    plt.title(f'process parallelism x thread parallelism for n={n} process/threads')
-    plt.legend()
-    plt.savefig(f'./results/{n}.png', dpi=400)
-    plt.close(fig)
     
+    
+    process_time.append(process_temp)
+    thread_time.append(thread_temp)
+
+
+# plot thread and process thread/process comparison
+fig, ax = plt.subplots(1, 1)
+for i in range(0, len(n_divisions)):
+    ax.plot(list(map(str, array_sizes)), process_time[i], label=f'n={n_divisions[i]}')
+plt.xlabel('array size')
+plt.ylabel('total time')
+plt.title(f'comparing sorting times for multiple number of processes')
+plt.legend()
+plt.savefig(f'./results/process.png', dpi=400)
+plt.close(fig)
+
+fig, ax = plt.subplots(1, 1)
+for i in range(0, len(n_divisions)):
+    ax.plot(list(map(str, array_sizes)), thread_time[i], label=f'n={n_divisions[i]}')
+plt.xlabel('array size')
+plt.ylabel('total time')
+plt.title(f'comparing sorting times for multiple number of threads')
+plt.legend()
+plt.savefig(f'./results/thread.png', dpi=400)
+plt.close(fig)

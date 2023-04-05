@@ -39,7 +39,6 @@ def parallel_thread_sort(size=100, n_thread=4, arr=[], verbose=False):
     # sort
     threads = []
     for a in split_arr:
-        print(a)
         p = td.Thread(target=sort_array, args=(a,))
         threads.append(p)
         p.start()
@@ -90,4 +89,4 @@ def parallel_thread_sort(size=100, n_thread=4, arr=[], verbose=False):
 if __name__ == '__main__':
     size = int(sys.argv[1])
     n_thread = int(sys.argv[2])
-    result = parallel_thread_sort(size=size, n_thread=n_thread, verbose=True)
+    result = parallel_thread_sort(size=size, n_thread=n_thread, verbose=False)

@@ -1,7 +1,6 @@
 import multiprocessing as mp
 import sys
 from utils import generate_array, split_array
-import time 
 
 def sort_array(arr, queue):
     arr.sort()
@@ -49,7 +48,7 @@ def parallel_process_sort(size=100, n_process=4, arr=[], verbose=False):
         p.start()
 
     for p in processes:
-        p.join()
+        # p.join() # remove join because deadlock (doc on readme)
         results.append(queue.get())
 
     if verbose:
@@ -74,7 +73,7 @@ def parallel_process_sort(size=100, n_process=4, arr=[], verbose=False):
             i += 2
 
         for p in processes:
-            p.join()
+            # p.join() # remove join because deadlock (doc on readme)
             merged_results.append(queue.get())
         
         # in case theres an odd number of partitions
