@@ -2,8 +2,38 @@ import threading as td
 import sys
 from utils import generate_array, split_array
 
+def merge_sort(arr):
+    if len(arr) > 1:
+        mid = len(arr) // 2
+        left_arr = arr[:mid]
+        right_arr = arr[mid:]
+        
+        merge_sort(left_arr)
+        merge_sort(right_arr)
+
+        i, j, k = 0, 0, 0
+
+        while i < len(left_arr) and j < len(right_arr):
+            if left_arr[i] < right_arr[j]:
+                arr[k] = left_arr[i]
+                i += 1
+            else:
+                arr[k] = right_arr[j]
+                j += 1
+            k += 1
+        
+        while i < len(left_arr):
+            arr[k] = left_arr[i]
+            i += 1
+            k += 1
+
+        while j < len(right_arr):
+            arr[k] = right_arr[j]
+            j += 1
+            k += 1
+      
 def sort_array(arr):
-    arr.sort()
+    merge_sort(arr)
 
 def merge(left_arr, right_arr, merged_results):
     merged = []
@@ -89,4 +119,4 @@ def parallel_thread_sort(size=100, n_thread=4, arr=[], verbose=False):
 if __name__ == '__main__':
     size = int(sys.argv[1])
     n_thread = int(sys.argv[2])
-    result = parallel_thread_sort(size=size, n_thread=n_thread, verbose=False)
+    result = parallel_thread_sort(size=size, n_thread=n_thread, verbose=True)

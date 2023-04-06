@@ -5,7 +5,7 @@ from parallel_thread_sort import parallel_thread_sort
 import time
 
 array_sizes = [64, 256, 1024, 8192, 65536, 262144, 1048576]
-n_divisions = [1, 2, 4, 8, 16, 32]
+n_divisions = [1, 2, 4, 8, 16]
 
 process_time = []
 thread_time = []
