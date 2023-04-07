@@ -1,8 +1,10 @@
 ﻿# Laboratório 1 - Paralelismo de Processos e Threads
 
 ## Integrantes do grupo
-x - Mestrado - Breno Aguiar Krohling
+2022132020 - Mestrado - Breno Aguiar Krohling
+
 2021231578 - Mestrado - Lucas Miguel Tassis
+
 x - Doutorado - Vitor Fontana Zanotelli
 
 ## Introdução
