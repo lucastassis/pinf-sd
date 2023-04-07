@@ -36,7 +36,7 @@ Por exemplo, se quiser realizar a ordenação de um vetor de tamanho 1000, utili
 
 `python parallel_process_sort 1000 4 merge_sort`
 
-Três opções de algoritmo de ordenação são disponibilizadas (utilizando as keywords abaixo no lugar da variável `algoritmo_sorting`):
+Três opções de algoritmo de ordenação são disponibilizadas (utilizando as keywords abaixo no lugar da variável `algoritmo_sorting`:
 
 `merge_sort`: implementação do *merge_sort*.
 
