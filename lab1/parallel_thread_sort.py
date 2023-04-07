@@ -1,39 +1,15 @@
 import threading as td
 import sys
 from utils import generate_array, split_array
+from sort import merge_sort, selection_sort
 
-def merge_sort(arr):
-    if len(arr) > 1:
-        mid = len(arr) // 2
-        left_arr = arr[:mid]
-        right_arr = arr[mid:]
-        
-        merge_sort(left_arr)
-        merge_sort(right_arr)
-
-        i, j, k = 0, 0, 0
-
-        while i < len(left_arr) and j < len(right_arr):
-            if left_arr[i] < right_arr[j]:
-                arr[k] = left_arr[i]
-                i += 1
-            else:
-                arr[k] = right_arr[j]
-                j += 1
-            k += 1
-        
-        while i < len(left_arr):
-            arr[k] = left_arr[i]
-            i += 1
-            k += 1
-
-        while j < len(right_arr):
-            arr[k] = right_arr[j]
-            j += 1
-            k += 1
-      
-def sort_array(arr):
-    merge_sort(arr)
+def sort_array(arr, sort):
+    if sort == 'merge_sort':
+        merge_sort(arr)
+    elif sort == 'selection_sort':
+        selection_sort(arr)
+    elif sort == 'python_sort':
+        arr.sort()
 
 def merge(left_arr, right_arr, merged_results):
     merged = []
@@ -56,7 +32,11 @@ def merge(left_arr, right_arr, merged_results):
     
     merged_results.append(merged)
 
-def parallel_thread_sort(size=100, n_thread=4, arr=[], verbose=False):
+def parallel_thread_sort(size=100, n_thread=4, sort='merge_sort', arr=[], verbose=False):
+    if sort not in ['merge_sort', 'selection_sort', 'python_sort']:
+        print('sorting method invalid, choose between merge_sort, selection_sort and python_sort')
+        return
+    
     if not arr:
         arr = generate_array(size)
 
@@ -69,7 +49,7 @@ def parallel_thread_sort(size=100, n_thread=4, arr=[], verbose=False):
     # sort
     threads = []
     for a in split_arr:
-        p = td.Thread(target=sort_array, args=(a,))
+        p = td.Thread(target=sort_array, args=(a, sort))
         threads.append(p)
         p.start()
 
@@ -119,4 +99,5 @@ def parallel_thread_sort(size=100, n_thread=4, arr=[], verbose=False):
 if __name__ == '__main__':
     size = int(sys.argv[1])
     n_thread = int(sys.argv[2])
-    result = parallel_thread_sort(size=size, n_thread=n_thread, verbose=True)
+    sort = sys.argv[3]
+    result = parallel_thread_sort(size=size, n_thread=n_thread, sort=sort, verbose=True)

@@ -1,40 +1,18 @@
 import multiprocessing as mp
 import sys
 from utils import generate_array, split_array
+from sort import merge_sort, selection_sort
 
-def merge_sort(arr):
-    if len(arr) > 1:
-        mid = len(arr) // 2
-        left_arr = arr[:mid]
-        right_arr = arr[mid:]
-        
-        merge_sort(left_arr)
-        merge_sort(right_arr)
-
-        i, j, k = 0, 0, 0
-
-        while i < len(left_arr) and j < len(right_arr):
-            if left_arr[i] < right_arr[j]:
-                arr[k] = left_arr[i]
-                i += 1
-            else:
-                arr[k] = right_arr[j]
-                j += 1
-            k += 1
-        
-        while i < len(left_arr):
-            arr[k] = left_arr[i]
-            i += 1
-            k += 1
-
-        while j < len(right_arr):
-            arr[k] = right_arr[j]
-            j += 1
-            k += 1
-
-def sort_array(arr, queue):
-    merge_sort(arr)
-    queue.put(arr)
+def sort_array(arr, queue, sort):
+    if sort == 'merge_sort':
+        merge_sort(arr)
+        queue.put(arr)
+    elif sort == 'selection_sort':
+        selection_sort(arr)
+        queue.put(arr)
+    elif sort == 'python_sort':
+        arr.sort()
+        queue.put(arr)
 
 def merge(left_arr, right_arr, queue):
     merged = []
@@ -57,7 +35,11 @@ def merge(left_arr, right_arr, queue):
     
     queue.put(merged)
 
-def parallel_process_sort(size=100, n_process=4, arr=[], verbose=False):
+def parallel_process_sort(size=100, n_process=4, sort='merge_sort', arr=[], verbose=False):
+    if sort not in ['merge_sort', 'selection_sort', 'python_sort']:
+        print('sorting method invalid, choose between merge_sort, selection_sort and python_sort')
+        return
+    
     if not arr:
         arr = generate_array(size)
 
@@ -73,7 +55,7 @@ def parallel_process_sort(size=100, n_process=4, arr=[], verbose=False):
     queue = mp.Queue()
 
     for a in split_arr:
-        p = mp.Process(target=sort_array, args=(a, queue))
+        p = mp.Process(target=sort_array, args=(a, queue, sort))
         processes.append(p)
         p.start()
 
@@ -123,4 +105,5 @@ def parallel_process_sort(size=100, n_process=4, arr=[], verbose=False):
 if __name__ == '__main__':
     size = int(sys.argv[1])
     n_process = int(sys.argv[2])
-    result = parallel_process_sort(size=size, n_process=n_process, verbose=True)
+    sort = sys.argv[3]
+    result = parallel_process_sort(size=size, n_process=n_process, sort=sort, verbose=True)
