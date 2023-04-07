@@ -8,7 +8,7 @@
 2022241702 - Doutorado - Vitor Fontana Zanotelli
 
 ## Introdução
-Nesse laboratório, foi pedido a implementação de algoritmos de ordenação utilizando paralelismo de processos e threads. As implementações foram realizadas utilizando a linguagem Python, com o auxílio das bibliotecas `multiprocessing`e `multithreading`.
+Nesse laboratório, foi pedido a implementação de algoritmos de ordenação utilizando paralelismo de processos e threads. As implementações foram realizadas utilizando a linguagem Python, com o auxílio das bibliotecas `multiprocessing`e `threading`.
 
 No restante desse documento será apresentado a organização do diretório e intruções para execução, detalhes da implementação, e por fim, resultados obtidos e conclusões.
 
@@ -18,7 +18,7 @@ No restante desse documento será apresentado a organização do diretório e in
 O diretório está organizado da seguinte forma:
 
 `./parallel_process_sort.py`: é o arquivo que contém a implementação do paralelismo utilizando processos com a utilização da lib `multiprocessing` do Python.
-`./parallel_thread_sort.py`: é o arquivo que contém a implementação do paralelismo utilizando threads com a utilização da lib `multithreading` do Python.
+`./parallel_thread_sort.py`: é o arquivo que contém a implementação do paralelismo utilizando threads com a utilização da lib `threading` do Python.
 `./utils.py`: contém algumas funções utilitárias utilizada em ambas implementações do paralelismo, como as funções para gerar um *array* aleatório e fazer seu *split* em partes.
 `./sort.py`: contém a implementação dos algoritmos de *merge sort* e *selection sort*.
 `./script.py`: é um script para gerar um *plot* comparando o tempo de execução com diferente número de threads/processos.
