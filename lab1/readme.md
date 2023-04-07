@@ -1,4 +1,6 @@
 ﻿# Laboratório 1 - Paralelismo de Processos e Threads
+ 
+ [Link para o vídeo de apresentação](https://drive.google.com/file/d/1wPGPmYeU6OAB4lG8vju9tlUHxrljZIlp/view?usp=sharing)
 
 ## Integrantes do grupo
 2022132020 - Mestrado - Breno Aguiar Krohling
@@ -71,7 +73,7 @@ Como o paralelismo de thread não tem o problema de comunicação (como no paral
 
 ### Setup Experimental
 
-Para os experimentos utilizamos arrays de tamanho: [64, 256, 1024, 8192, 65536, 262144, 1048576] para o *mergesort* e *python sort*; e [64, 256, 1024, 8192, 65536] para o *selection sort* (por conta do tempo de computação). O número de processos/threads utilizados foram: [1, 2, 4, 8, 16]. Para cada algoritmo de ordenação, fizemos dois plots: (1) comparando o tempo de computação entre o número de processos utilizados; (2) comparando o tempo de computação entre o número de threads utilizado. Os resultados obtidos são apresentados a seguir.
+Para os experimentos utilizamos arrays de tamanho: [64, 256, 1024, 8192, 65536, 262144, 1048576] para o *mergesort* e *python sort*; e [64, 256, 1024, 8192, 65536] para o *selection sort* (por conta do tempo de computação). O número de processos/threads utilizados foram: [1, 2, 4, 8, 16]. Para cada algoritmo de ordenação, fizemos dois plots: (1) comparando o tempo de computação entre o número de processos utilizados; (2) comparando o tempo de computação entre o número de threads utilizado. Os resultados obtidos são apresentados a seguir. Os resultados apresentados foram obtidos rodando o script em um computador com um processador Intel i5-1135G7 @ 2.4GHz e 8Gb de RAM.
 
 ### Mergesort
 
