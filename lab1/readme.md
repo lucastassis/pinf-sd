@@ -101,8 +101,7 @@ Observando agora os gráficos do paralelismo de processo, notamos que há uma pe
 
 Por fim, houve algum ganho com a utilização do paralelismo de processos/threads... porém um ganho menor do que esperado. Ao que tudo indica (pelas referências mencionadas), isso é um problema com o sistema de multi-processos e multithreading do próprio Python, que acaba acrescentando um gargalo no desempenho dessas técnicas. É por conta disso que algumas bibliotecas como, por exemplo, o NumPy, mudam o código em C do python para acrescentar paralelismo real para aumento de desempenho, ao invés de utilizar o disponibilizado pelo próprio Python.
 
-Esse post também discute alguns problemas com o desempenho do multiprocessing no python: (link)[https://pythonspeed.com/articles/faster-multiprocessing-pickle/]
-
+Esse post também discute alguns problemas com o desempenho do multiprocessing no python: [link](https://pythonspeed.com/articles/faster-multiprocessing-pickle/)
 
 
 ## Conclusão
