@@ -5,7 +5,7 @@
 
 2021231578 - Mestrado - Lucas Miguel Tassis
 
-x - Doutorado - Vitor Fontana Zanotelli
+2022241702 - Doutorado - Vitor Fontana Zanotelli
 
 ## Introdução
 Nesse laboratório, foi pedido a implementação de algoritmos de ordenação utilizando paralelismo de processos e threads. As implementações foram realizadas utilizando a linguagem Python, com o auxílio das bibliotecas `multiprocessing`e `multithreading`.
