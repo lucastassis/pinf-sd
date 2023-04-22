@@ -1,6 +1,6 @@
 # Laboratório 2 - Aprendizado Federado
 
-**falta o link para o vídeo**
+[Link do video](https://drive.google.com/file/d/14SPT_tr1lYxmNZdtn3WowU2hRJtpbTDL/view?usp=share_link)
 
 ## Integrantes do grupo
 
