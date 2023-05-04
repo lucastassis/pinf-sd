@@ -6,6 +6,18 @@ import hashlib
 import pandas as pd
 import random
 
+# From https://codereview.stackexchange.com/a/260276
+def str_bin_in_4digits(hex_string: str) -> str:
+    """
+    Turn a hex string into a binary string.
+    In the output string, binary digits are space separated in groups of 4.
+
+    >>> str_bin_in_4digits('20AC')
+    '0010000010101100'
+    """
+
+    return f"{int(hex_string,16):0{len(hex_string)*5-1}_b}".replace('_', '')
+
 def serve():
     grpc_server = grpc.server(futures.ThreadPoolExecutor(max_workers=10))
     mine_grpc_pb2_grpc.add_apiServicer_to_server(Servicer(), grpc_server)
@@ -17,7 +29,7 @@ class Servicer(mine_grpc_pb2_grpc.apiServicer):
 
     def __init__(self):
         self.transactionTable = pd.DataFrame([{'TransactionID' : 0,
-                                              'Challenge' : random.randint(1, 3),
+                                              'Challenge' : random.randint(20, 25),
                                               'Solution' : "",
                                               'Winner' : 0}])
 
@@ -49,8 +61,40 @@ class Servicer(mine_grpc_pb2_grpc.apiServicer):
         return mine_grpc_pb2.intResult(result=result)
         
     def submitChallenge(self, request, context):
-        pass
-    
+        # check if valid transactionID
+        try:
+            current = self.transactionTable[self.transactionTable['TransactionID'] == request.transactionId]
+            challenge = current['Challenge'].tolist()[0]
+        except:
+            result = -1
+            print(f'submitChallenge() results in {result}')
+            return mine_grpc_pb2.intResult(result=result)
+
+        # check if already solved
+        if current['Winner'].tolist()[0] != 0:
+            result = 2
+            print(f'submitChallenge() results in {result}')
+            return mine_grpc_pb2.intResult(result=result)
+        
+        # check if valid solution
+        bin_solution = str_bin_in_4digits(request.solution)
+        if bin_solution[:challenge] == '0' * challenge:
+            result = 1
+            self.transactionTable.loc[self.transactionTable['TransactionID'] == request.transactionId, 'Solution'] = request.solution
+            self.transactionTable.loc[self.transactionTable['TransactionID'] == request.transactionId, 'Winner'] = request.clientId
+            print(f'submitChallenge() results in {result}')
+
+            new_challenge = pd.DataFrame([{'TransactionID' : self.transactionTable.shape[0],
+                                           'Challenge' : random.randint(20, 25),
+                                           'Solution' : "",
+                                           'Winner' : 0}])
+            self.transactionTable = pd.concat([self.transactionTable, new_challenge], ignore_index=True)
+            return mine_grpc_pb2.intResult(result=result)
+        else:
+            result = 0
+            print(f'submitChallenge() results in {result}')
+            return mine_grpc_pb2.intResult(result=result)
+
     def getWinner(self, request, context):
         try:
             current = self.transactionTable[self.transactionTable['TransactionID'] == request.transactionId]
