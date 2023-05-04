@@ -29,7 +29,7 @@ class Servicer(mine_grpc_pb2_grpc.apiServicer):
 
     def __init__(self):
         self.transactionTable = pd.DataFrame([{'TransactionID' : 0,
-                                              'Challenge' : random.randint(20, 25),
+                                              'Challenge' : random.randint(10, 20),
                                               'Solution' : "",
                                               'Winner' : -1}])
 
@@ -51,7 +51,6 @@ class Servicer(mine_grpc_pb2_grpc.apiServicer):
         try:
             current = self.transactionTable.loc[self.transactionTable['TransactionID'] == request.transactionId]
             result = current['Winner'].tolist()[0]
-            print(result)
             if result == -1:
                 result = 1
             else:
@@ -70,7 +69,7 @@ class Servicer(mine_grpc_pb2_grpc.apiServicer):
             result = -1
             print(f'submitChallenge() results in {result}')
             return mine_grpc_pb2.intResult(result=result)
-
+        print('hjeeeeeaskdpoksaokdokpaskopd')
         # check if already solved
         if current['Winner'].tolist()[0] != -1:
             result = 2
@@ -86,9 +85,9 @@ class Servicer(mine_grpc_pb2_grpc.apiServicer):
             print(f'submitChallenge() results in {result}')
 
             new_challenge = pd.DataFrame([{'TransactionID' : self.transactionTable.shape[0],
-                                           'Challenge' : random.randint(20, 25),
+                                           'Challenge' : random.randint(10, 20),
                                            'Solution' : "",
-                                           'Winner' : 0}])
+                                           'Winner' : -1}])
             self.transactionTable = pd.concat([self.transactionTable, new_challenge], ignore_index=True)
             return mine_grpc_pb2.intResult(result=result)
         else:
@@ -101,13 +100,16 @@ class Servicer(mine_grpc_pb2_grpc.apiServicer):
             current = self.transactionTable[self.transactionTable['TransactionID'] == request.transactionId]
             result = current['Winner'].tolist()[0]
             if result == -1:
+                print(f'getWinner() results in {0}')        
                 return mine_grpc_pb2.intResult(result=0)
             else:
+                print(f'getWinner() results in {result}')        
                 return mine_grpc_pb2.intResult(result=result)
         except:
             result = -1
-        print(f'getWinner() results in {result}')        
-        return mine_grpc_pb2.intResult(result=result)
+            print(f'getWinner() results in {result}')        
+            return mine_grpc_pb2.intResult(result=result)
+        
     
     def getSolution(self, request, context):
         current = self.transactionTable.loc[self.transactionTable['TransactionID'] == request.transactionId]
