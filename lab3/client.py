@@ -22,17 +22,15 @@ def str_bin_in_4digits(hex_string: str) -> str:
 
 def mine(client, client_id):
     transactionId = client.getTransactionId(mine_grpc_pb2.void()).result
-    challenge = client.getChallenge(mine_grpc_pb2.transactionId(transactionId=transactionId)).result    
-    m = hashlib.sha1()
-    for i in np.random.permutation(10000000).tolist():
-        s = str(i)
-        m.update(b"s")
-        res = m.hexdigest()
+    challenge = client.getChallenge(mine_grpc_pb2.transactionId(transactionId=transactionId)).result   
+    i = 0 
+    while True:
+        res = hashlib.sha1(str(i).encode()).hexdigest()
         bin_res = str_bin_in_4digits(res)
         if bin_res[:challenge] == challenge * '0':
-            print('dsadsuahdsuahui')
             r = client.submitChallenge(mine_grpc_pb2.challengeArgs(transactionId=transactionId, clientId=client_id, solution=res))
             return r
+        i += 1
 
 def run(client, n, client_id):
     if n == '1':

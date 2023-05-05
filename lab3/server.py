@@ -69,7 +69,6 @@ class Servicer(mine_grpc_pb2_grpc.apiServicer):
             result = -1
             print(f'submitChallenge() results in {result}')
             return mine_grpc_pb2.intResult(result=result)
-        print('hjeeeeeaskdpoksaokdokpaskopd')
         # check if already solved
         if current['Winner'].tolist()[0] != -1:
             result = 2
@@ -83,6 +82,9 @@ class Servicer(mine_grpc_pb2_grpc.apiServicer):
             self.transactionTable.loc[self.transactionTable['TransactionID'] == request.transactionId, 'Solution'] = request.solution
             self.transactionTable.loc[self.transactionTable['TransactionID'] == request.transactionId, 'Winner'] = request.clientId
             print(f'submitChallenge() results in {result}')
+            print(bin_solution)
+            print(challenge)
+            print(request.solution)
 
             new_challenge = pd.DataFrame([{'TransactionID' : self.transactionTable.shape[0],
                                            'Challenge' : random.randint(10, 20),
