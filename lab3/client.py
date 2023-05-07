@@ -92,9 +92,9 @@ def connect(addr):
     channel = grpc.insecure_channel(addr)
     client = mine_grpc_pb2_grpc.apiStub(channel)
     client_id = random.randint(1, 100000)
-    print(client_id)
+    print(f'Cliente {client_id} inicializado')
     while True:
-        print('Choose:')
+        print('Escolha:')
         print('1 para getTransactionId,')
         print('2 para getChallenge,')
         print('3 para getTransactionStatus,')

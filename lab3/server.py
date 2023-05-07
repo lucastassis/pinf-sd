@@ -29,7 +29,7 @@ class Servicer(mine_grpc_pb2_grpc.apiServicer):
 
     def __init__(self):
         self.transactionTable = pd.DataFrame([{'TransactionID' : 0,
-                                              'Challenge' : random.randint(10, 20),
+                                              'Challenge' : random.randint(1, 20),
                                               'Solution' : "",
                                               'Winner' : -1}])
 
@@ -82,12 +82,9 @@ class Servicer(mine_grpc_pb2_grpc.apiServicer):
             self.transactionTable.loc[self.transactionTable['TransactionID'] == request.transactionId, 'Solution'] = request.solution
             self.transactionTable.loc[self.transactionTable['TransactionID'] == request.transactionId, 'Winner'] = request.clientId
             print(f'submitChallenge() results in {result}')
-            print(bin_solution)
-            print(challenge)
-            print(request.solution)
 
             new_challenge = pd.DataFrame([{'TransactionID' : self.transactionTable.shape[0],
-                                           'Challenge' : random.randint(10, 20),
+                                           'Challenge' : random.randint(1, 20),
                                            'Solution' : "",
                                            'Winner' : -1}])
             self.transactionTable = pd.concat([self.transactionTable, new_challenge], ignore_index=True)
