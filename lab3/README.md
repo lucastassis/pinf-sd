@@ -1,6 +1,6 @@
 # Laboratório 3 - Chamada de Procedimento Remoto
 
-[Link do video]()
+[Link do video](https://drive.google.com/file/d/1Q9J3U_64qZvPD0ibrhTaBuAJTdx45V3d/view)
 
 ## Integrantes do grupo
 
@@ -22,7 +22,7 @@ Todos os códigos implementados estão disponibilizados no diretório `lab3/`. O
 
 ### Instruções para execução
 
-Para execução do código basta inicialmente subir o servidor com o comando `python server.py`. Para execução dos clientes basta utilizar o comando `python client.py address`, por exemplo, `python server.py localhost:8080`. O client possui uma interface de texto bastante simples para comunicação e utilização de comandos.
+Para execução do código basta inicialmente subir o servidor com o comando `python server.py`. Para execução dos clientes basta utilizar o comando `python client.py address`, por exemplo, `python client.py localhost:8080`. O client possui uma interface de texto bastante simples para comunicação e utilização de comandos.
 
 ## Implementação
 
@@ -72,7 +72,7 @@ A imagem abaixo mostra um exemplo simples, apenas mostrando a interface de um cl
 
 <img src="figs/exemplo.png" width="600"/>
 
-Foi possível encontrar hashes iniciando com 20 zeros de forma bem rápida apesar de ser um problema difícil, dado que a probabilidade é de encontrar essa chave é de $\frac{1}{2^n}$. Porém, um *loop* iniciando de 1 e indo até $2^20$, que é aproximadamente 1M é computado em pouco tempo, logo uma chave também pode ser encontrada nesse intervalo, ou pelo menos foi isso que achamos :) . Valores maiores começam a ficar mais difíceis (como esperado), mas não foi feito um estudo  mais profundo para medir o quão maior. 
+Foi possível encontrar hashes iniciando com 20 zeros de forma bem rápida apesar de ser um problema difícil, dado que a probabilidade é de encontrar essa chave é de $\frac{1}{2^n}$. Porém, um *loop* iniciando de 1 e indo até $2^{20}$, que é aproximadamente 1M é computado em pouco tempo, logo uma chave também pode ser encontrada nesse intervalo, ou pelo menos foi isso que achamos :) . Valores maiores começam a ficar mais difíceis (como esperado), mas não foi feito um estudo  mais profundo para medir o quão maior. 
 
 Pesquisando sobre isso, encontramos esse [link](https://people.cs.rutgers.edu/~pxk/419/hw/a-13.html) que fala de um problema semelhante (encontrar o sufixo, dado um prefixo, que forma a hash com d número de zeros). Na seção An Easier Puzzle > Adaptative Complexity, podemos ver uma tabela comparando alguns tempos de execução variando o d, e notamos que para ~d = 20, um resultado é também encontrado de forma bem rápida. 
 
