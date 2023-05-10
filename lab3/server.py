@@ -76,7 +76,8 @@ class Servicer(mine_grpc_pb2_grpc.apiServicer):
             return mine_grpc_pb2.intResult(result=result)
         
         # check if valid solution
-        bin_solution = str_bin_in_4digits(request.solution)
+        solution = hashlib.sha1(request.solution.encode()).hexdigest()
+        bin_solution = str_bin_in_4digits(solution)
         if bin_solution[:challenge] == '0' * challenge:
             result = 1
             self.transactionTable.loc[self.transactionTable['TransactionID'] == request.transactionId, 'Solution'] = request.solution

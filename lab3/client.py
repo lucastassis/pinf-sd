@@ -28,7 +28,7 @@ def mine(client, client_id):
         res = hashlib.sha1(str(i).encode()).hexdigest()
         bin_res = str_bin_in_4digits(res)
         if bin_res[:challenge] == challenge * '0':
-            r = client.submitChallenge(mine_grpc_pb2.challengeArgs(transactionId=transactionId, clientId=client_id, solution=res))
+            r = client.submitChallenge(mine_grpc_pb2.challengeArgs(transactionId=transactionId, clientId=client_id, solution=str(i)))
             return r
         i += 1
 
