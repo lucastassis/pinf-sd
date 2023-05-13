@@ -1,65 +1,49 @@
-import tensorflow as tf
-import os
-os.environ["TF_CPP_MIN_LOG_LEVEL"] = "3"
-from tensorflow.keras.models import Sequential
-from tensorflow.keras.layers import Conv2D, MaxPool2D,Flatten,Dense
-from tensorflow.keras.optimizers import SGD
-import uuid
+import paho.mqtt.client as mqtt
+from trainer import Trainer
+import json 
 import numpy as np
+import time
 
-class Client:
-    def __init__(self) -> None:
-        # id and model
-        self.id = uuid.uuid1().int
-        self.model = self.define_model()
-        # split data
-        self.num_samples = np.random.choice(np.arange(10000, 20000, 2000)) # select a random number ranging from 10000 < num_samples < 20000
-        self.x_train, self.y_train, self.x_test, self.y_test = self.split_data()
-    
-    def define_model(self, input_shape=(28, 28, 1), n_classes=10):
-        model = Sequential()
-        model.add(Conv2D(32, (3, 3), activation='relu', kernel_initializer='he_uniform', input_shape=input_shape))
-        model.add(MaxPool2D((2, 2)))
-        model.add(Flatten())
-        model.add(Dense(100, activation='relu', kernel_initializer='he_uniform'))
-        model.add(Dense(n_classes, activation='softmax'))
-        opt = SGD(learning_rate=0.01, momentum=0.9)
-        model.compile(optimizer=opt, loss='categorical_crossentropy', metrics=['accuracy'])
+def on_connect(client, userdata, flags, rc):
+    subscribe_queues = ['sd/trab42/selectionQueue', 'sd/trab42/posAggQueue', 'sd/trab42/stopQueue']
+    for s in subscribe_queues:
+        client.subscribe(s)
 
-        return model
-    
-    def split_data(self):
-        # load and preprocess data
-        (x_train, y_train), (x_test, y_test) = tf.keras.datasets.mnist.load_data()
-        x_train = x_train / 255
-        x_test = x_test / 255
-        # split data
-        idx_train = np.random.choice(np.arange(len(x_train)), self.num_samples, replace=False)
-        x_train = x_train[idx_train]
-        y_train = tf.one_hot(y_train[idx_train].astype(np.int32), depth=10)
-        y_test = tf.one_hot(y_test.astype(np.int32), depth=10)
+def on_message_selection(client, userdata, message):
+    msg = json.loads(message.payload.decode("utf-8"))
+    if int(msg['id']) == trainer.get_id():
+        if bool(msg['chosen']) == True:
+            trainer.train_model()
+            response = json.dumps({'id' : trainer.get_id(), 'weights' : [w.tolist() for w in trainer.get_weights()], 'num_samples' : trainer.get_num_samples()})
+            client.publish('sd/trab42/preAggQueue', response)
 
-        return x_train, y_train, x_test, y_test
+def on_message_agg(client, userdata, message):
+    print(f'received aggregated weights')
+    msg = json.loads(message.payload.decode("utf-8"))
+    agg_weights = [np.asarray(w, dtype=np.float32) for w in msg["weights"]]
+    trainer.update_weights(agg_weights)
+    response = json.dumps({'id' : trainer.get_id(), 'accuracy' : trainer.eval_model()})
+    client.publish('sd/trab42/metricsQueue', response)
 
-    def train_model(self):
-        print(f'client {self.id} started training')
-        self.model.fit(x=self.x_train, y=self.y_train, batch_size=200, epochs=10)
+def on_message_stop(client, userdata, message):
+    print(f'received msg to stop')
+    trainer.set_stop_true()
+    exit()
 
-    def eval_model(self):
-        acc = self.model.evaluate(x=self.x_test, y=self.y_test, verbose=False)[1]
-        print(f'test accuracy = {acc}')
-    
-    def get_weights(self):
-        return self.model.get_weights()
-    
-    def update_weights(self, weights):
-        self.model.set_weights(weights)
+# connect on queue and send register 
+trainer = Trainer()
+client = mqtt.Client(str(trainer.get_id()))
+client.connect('localhost')
+client.on_connect = on_connect
+client.message_callback_add('sd/trab42/selectionQueue', on_message_selection)
+client.message_callback_add('sd/trab42/posAggQueue', on_message_agg)
+client.message_callback_add('sd/trab42/stopQueue', on_message_stop)
+client.publish('sd/trab42/registerQueue', trainer.get_id())
 
-if __name__ == '__main__':
-    c1 = Client()
-    c1.train_model()
-    c1.eval_model()
-    
-    c2 = Client()
-    c2.update_weights(c1.get_weights())
-    c2.eval_model()
+# start waiting for jobs
+client.loop_start()
+
+while not trainer.get_stop_flag():
+    time.sleep(1)
+
+client.loop_stop()
