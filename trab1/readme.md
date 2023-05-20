@@ -1,6 +1,6 @@
 # Trabalho I - Aprendizado Federado
 
-[Link para o vídeo de apresentação (desculpa passar um pouco dos 3min, foi por conta da espera na simulação :) )]([https://drive.google.com/file/d/1XBOd1tPMANAm72kMYJYcBv9a0X_npXDR/view?usp=share_link](https://drive.google.com/file/d/1h6Hqw4KrjuOEc1bjYAa89pnVQ0_lMsnJ/view?usp=sharing))
+[Link para o vídeo de apresentação (desculpa passar um pouco dos 3min, foi por conta da espera na simulação :) )](https://drive.google.com/file/d/1h6Hqw4KrjuOEc1bjYAa89pnVQ0_lMsnJ/view?usp=share_link)
 
 ## Integrantes do grupo
 2022132020 - Mestrado - Breno Aguiar Krohling
