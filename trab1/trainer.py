@@ -1,6 +1,6 @@
-import tensorflow as tf
 import os
-os.environ['TF_CPP_MIN_LOG_LEVEL'] = '1'
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3' 
+import tensorflow as tf
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Conv2D, MaxPool2D,Flatten,Dense
 from tensorflow.keras.optimizers import SGD
@@ -13,7 +13,7 @@ class Trainer:
         self.id = uuid.uuid1().int
         self.model = self.define_model()
         # split data
-        self.num_samples = int(np.random.choice(np.arange(10000, 20000, 2000))) # select a random number ranging from 10000 < num_samples < 20000
+        self.num_samples = int(np.random.choice(np.arange(10000, 20000, 1000))) # select a random number ranging from 10000 < num_samples < 20000
         self.x_train, self.y_train, self.x_test, self.y_test = self.split_data()
         self.stop_flag = False
     
@@ -49,12 +49,10 @@ class Trainer:
         return x_train, y_train, x_test, y_test
 
     def train_model(self):
-        print(f'trainer {self.id} started training')
-        self.model.fit(x=self.x_train, y=self.y_train, batch_size=200, epochs=2)
+        self.model.fit(x=self.x_train, y=self.y_train, batch_size=64, epochs=10, verbose=3)
 
     def eval_model(self):
         acc = self.model.evaluate(x=self.x_test, y=self.y_test, verbose=False)[1]
-        print(f'test accuracy = {acc}')
         return acc
     
     def get_weights(self):

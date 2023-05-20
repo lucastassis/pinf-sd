@@ -1,5 +1,6 @@
 import random
 import numpy as np
+import matplotlib.pyplot as plt
 
 class Controller:
     def __init__(self, min_trainers=2, num_rounds=5):
@@ -63,7 +64,7 @@ class Controller:
         self.acc_list.append(acc)
 
     # operations
-    def choose_trainers_for_round(self):
+    def select_trainers_for_round(self):
         return random.sample(self.trainer_list, self.min_trainers)
     
     def agg_weights(self):
@@ -88,6 +89,18 @@ class Controller:
 
         return agg_weights
 
+    def plot_training_metrics(self):
+        fig, ax = plt.subplots(1, 1)
+        x = self.mean_acc_per_round
+        y = np.arange(len(x)) + 1
+        plt.plot([str(s) for s in y], x)
+        plt.annotate('%0.3f' % x[-1], xy=(1, x[-1]), xytext=(8, 0), 
+                    xycoords=('axes fraction', 'data'), textcoords='offset points')
+        plt.xlabel('rounds')
+        plt.ylabel('accuracy')
+        plt.title(f'simulation using num_rounds={len(x)}')
+        plt.savefig(f'./simulation-rounds={len(x)}.png', dpi=600)
+        plt.close(fig)
 
                    
         
