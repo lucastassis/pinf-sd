@@ -3,9 +3,10 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 class Controller:
-    def __init__(self, min_trainers=2, num_rounds=5):
+    def __init__(self, min_trainers=2, trainers_per_round=2, num_rounds=5):
         self.trainer_list = []
         self.min_trainers = min_trainers
+        self.trainers_per_round = trainers_per_round
         self.current_round = 0
         self.num_rounds = num_rounds # total number of rounds
         self.num_responses = 0 # number of responses received on aggWeights and metrics
@@ -20,12 +21,6 @@ class Controller:
     
     def get_current_round(self):
         return self.current_round
-    
-    def get_min_trainers(self):
-        return self.min_trainers
-    
-    def get_num_rounds(self):
-        return self.num_rounds
     
     def get_num_trainers(self):
         return len(self.trainer_list)
@@ -65,7 +60,7 @@ class Controller:
 
     # operations
     def select_trainers_for_round(self):
-        return random.sample(self.trainer_list, self.min_trainers)
+        return random.sample(self.trainer_list, self.trainers_per_round)
     
     def agg_weights(self):
         scaling_factor = list(np.array(self.trainer_samples) / np.array(self.trainer_samples).sum())

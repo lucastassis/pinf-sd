@@ -9,14 +9,15 @@ import sys
 n = len(sys.argv)
  
 # check args
-if (n != 5):
-    print("correct use: python server.py <broker_address> <min_clients> <num_rounds> <accuracy_threshold>.")
+if (n != 6):
+    print("correct use: python server.py <broker_address> <min_clients> <clients_per_round> <num_rounds> <accuracy_threshold>.")
     exit()
 
-STOP_ACC = float(sys.argv[4])
-NUM_ROUNDS = int(sys.argv[3])
-MIN_TRAINERS = int(sys.argv[2])
 BROKER_ADDR = sys.argv[1]
+MIN_TRAINERS = int(sys.argv[2])
+TRAINERS_PER_ROUND = int(sys.argv[3])
+NUM_ROUNDS = int(sys.argv[4])
+STOP_ACC = float(sys.argv[5])
 
 # class for coloring messages on terminal
 class color:
@@ -56,7 +57,7 @@ def on_message_metrics(client, userdata, message):
     controller.update_num_responses()
     
 # connect on queue
-controller = Controller(min_trainers=MIN_TRAINERS, num_rounds=NUM_ROUNDS)
+controller = Controller(min_trainers=MIN_TRAINERS, trainers_per_round=TRAINERS_PER_ROUND, num_rounds=NUM_ROUNDS)
 client = mqtt.Client('server')
 client.connect(BROKER_ADDR)
 client.on_connect = on_connect
@@ -73,7 +74,7 @@ while controller.get_num_trainers() < MIN_TRAINERS:
     time.sleep(1)
 
 # begin training
-while controller.get_current_round() != controller.get_num_rounds():
+while controller.get_current_round() != NUM_ROUNDS:
     controller.update_current_round()
     print(color.RESET + '\n' + color.BOLD_START + f'starting round {controller.get_current_round()}' + color.BOLD_END)
     # select trainers for round
@@ -89,7 +90,7 @@ while controller.get_current_round() != controller.get_num_rounds():
             client.publish('sd/trab42/selectionQueue', m)
     
     # wait for agg responses
-    while controller.get_num_responses() != controller.get_min_trainers():
+    while controller.get_num_responses() != TRAINERS_PER_ROUND:
         time.sleep(1)
     controller.reset_num_responses() # reset num_responses for next round
 

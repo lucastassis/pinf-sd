@@ -26,11 +26,11 @@ O diretório está organizado da seguinte forma:
 ### Instruções para execução
 Para execução do servidor basta utilizar o seguinte comando:
 
-`python server.py <broker_address> <min_clients> <num_rounds> <accuracy_threshold>`
+`python server.py <broker_address> <min_clients> <clients_per_round> <num_rounds> <accuracy_threshold>`
 
-Por exemplo, se quiser iniciar o servidor em um broker EMQX no localhost, com o mínimo de clientes treinadores igual a 2 e uma acurácia mínima de 95%, basta:
+Por exemplo, se quiser iniciar o servidor em um broker EMQX no localhost, com o mínimo de clientes necessário para iniciar o treinamento igual a 3, o número de clientes escolhidos por round igual a 2, e uma acurácia mínima de 97%, basta:
 
-`python server.py localhost 2 5 0.95`
+`python server.py localhost 3 2 5 0.97`
 
 Para iniciar os clientes treinadores basta utilizar o seguinte comando:
 

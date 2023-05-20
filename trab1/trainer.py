@@ -49,7 +49,7 @@ class Trainer:
         return x_train, y_train, x_test, y_test
 
     def train_model(self):
-        self.model.fit(x=self.x_train, y=self.y_train, batch_size=64, epochs=10, verbose=3)
+        self.model.fit(x=self.x_train, y=self.y_train, batch_size=64, epochs=5, verbose=3)
 
     def eval_model(self):
         acc = self.model.evaluate(x=self.x_test, y=self.y_test, verbose=False)[1]
