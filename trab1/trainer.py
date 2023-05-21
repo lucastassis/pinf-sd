@@ -44,12 +44,15 @@ class Trainer:
         idx_train = np.random.choice(np.arange(len(x_train)), self.num_samples, replace=False)
         x_train = x_train[idx_train]
         y_train = tf.one_hot(y_train[idx_train].astype(np.int32), depth=10)
-        y_test = tf.one_hot(y_test.astype(np.int32), depth=10)
+        
+        idx_test = np.random.choice(np.arange(len(x_test)), 3000, replace=False)
+        x_test = x_test[idx_test]
+        y_test = tf.one_hot(y_test[idx_test].astype(np.int32), depth=10)
 
         return x_train, y_train, x_test, y_test
 
     def train_model(self):
-        self.model.fit(x=self.x_train, y=self.y_train, batch_size=64, epochs=5, verbose=3)
+        self.model.fit(x=self.x_train, y=self.y_train, batch_size=64, epochs=10, verbose=3)
 
     def eval_model(self):
         acc = self.model.evaluate(x=self.x_test, y=self.y_test, verbose=False)[1]
