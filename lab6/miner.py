@@ -55,11 +55,13 @@ class Miner():
     
     # ops
     def election(self):
-        winner = max(self.voter_list)
+        winner = max(self.voter_list, key=self.voter_list.get)
         if int(winner) == self.id:
             self._is_leader = True
+            print(f'I\'m the leader!')
         else:
             self._is_leader = False
+            print(f'I\'m a miner!')
     
     def create_challenge(self):
         self.challenge = random.randint(10, 20)

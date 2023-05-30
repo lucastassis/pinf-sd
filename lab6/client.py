@@ -7,8 +7,14 @@ import hashlib
 import uuid
 from miner import Miner
 
-BROKER_ADDR  = 'broker.emqx.io'
-N = 2
+n = len(sys.argv)
+
+if n < 3:
+    print('Incorrect command, try: python client.py <BROKER_ADDR> <N_CLIENTS>')
+    exit()
+
+BROKER_ADDR  = sys.argv[1]
+N = int(sys.argv[2])
 
 def on_connect(client, userdata, flags, rc):
     client.subscribe('sd/42/init')
@@ -39,11 +45,13 @@ def on_message_result(client, userdata, message):
         if solved:
             print(f'Challenged solved by miner {m["ClientID"]} with solution {m["Solution"]}')
             client.publish('sd/42/exit', True)
+            exit()
 
 def on_message_exit(client, userdata, message):
     exit()
     
 miner = Miner()
+print(f'Miner (ID: {miner.get_id()}) started!')
 client = mqtt.Client(str(miner.get_id()))
 client.connect(BROKER_ADDR)
 client.on_connect = on_connect
@@ -56,16 +64,18 @@ client.message_callback_add('sd/42/exit', on_message_exit)
 # start client loop
 client.loop_start()
 
-# gambiarra de conexao
-time.sleep(2)
-
 # publish on init and wait
-m = json.dumps({'ClientID' : miner.get_id()})
-client.publish('sd/42/init', m)
 while miner.get_num_miners() != N:
+    m = json.dumps({'ClientID' : miner.get_id()})
+    client.publish('sd/42/init', m)
     time.sleep(1)
 
+# send m again to avoid deadlocks on "late clients"
+m = json.dumps({'ClientID' : miner.get_id()})
+client.publish('sd/42/init', m)
+
 # publish on voting and wait
+print(f'My vote is: {miner.get_vote()}')
 m = json.dumps({'ClientID' : str(miner.get_id()), 'VoteID' : miner.get_vote()})
 client.publish('sd/42/voting', m)
 while miner.get_num_voters() != N:
