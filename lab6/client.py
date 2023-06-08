@@ -33,6 +33,7 @@ def on_message_voting(client, userdata, message):
 
 def on_message_challenge(client, userdata, message):
     if not miner.is_leader():
+        print('Starting to solve challenge!')
         m = json.loads(message.payload.decode("utf-8"))
         result = miner.solve_challenge(m['Challenge'])
         r = json.dumps({'ClientID' : str(miner.get_id()), 'Solution' : result})
