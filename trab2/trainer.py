@@ -33,8 +33,8 @@ class Trainer():
         self.num_responses = 0 # number of responses received on aggWeights and metrics
         self.weights = [] # save weights for agg
         self.trainer_samples = [] # save num_samples scale for agg
-        self.acc_list = []
-        self.mean_acc_per_round = []
+        self.accuracy_list = []
+        self.mean_accuracy = 0
 
     # --------------- general methods --------------- #
     # getters and setters
@@ -142,11 +142,6 @@ class Trainer():
     
     def get_num_responses(self):
         return self.num_responses
-
-    def get_mean_acc(self):
-        mean = float(np.mean(np.array(self.acc_list)))
-        self.mean_acc_per_round.append(mean) # save mean acc
-        return mean
     
     # "setters"
     def update_num_responses(self):
@@ -155,58 +150,43 @@ class Trainer():
     def reset_num_responses(self):
         self.num_responses = 0
     
-    def reset_acc_list(self):
-        self.acc_list = []
-    
     def update_current_round(self):
         self.current_round += 1
 
     def add_weight(self, weights):
         self.weights.append(weights)
     
+    def get_weight_list(self):
+        return self.weights
+
+    def reset_weight_list(self):
+        self.weights = []
+    
     def add_num_samples(self, num_samples):
         self.trainer_samples.append(num_samples)
     
-    def add_accuracy(self, acc):
-        self.acc_list.append(acc)
+    def get_trainer_samples_list(self):
+        return self.trainer_samples
 
+    def reset_trainer_samples_list(self):
+        self.trainer_samples = []
+    
+    def add_accuracy(self, acc):
+        self.accuracy_list.append(acc)
+    
+    def get_accuracy_list(self):
+        return self.accuracy_list
+    
+    def reset_accuracy_list(self):
+        self.accuracy_list = []
+    
+    def set_mean_accuracy(self, mean_accuracy):
+        self.mean_accuracy = mean_accuracy
+        
+    def get_mean_accuracy(self):
+        return self.mean_accuracy
+    
     # operations
     def select_trainers_for_round(self):
         return random.sample(self.trainer_list, self.trainers_per_round)
     
-    def agg_weights(self):
-        scaling_factor = list(np.array(self.trainer_samples) / np.array(self.trainer_samples).sum())
-        
-        # scale weights
-        for scaling, weights in zip(scaling_factor, self.weights):
-            for i in range(0, len(weights)):
-                weights[i] = weights[i] * scaling
-        
-        # agg weights
-        agg_weights = []
-        for layer in range(0, len(self.weights[0])):
-            var = []
-            for model in range(0, len(self.weights)):
-                var.append(self.weights[model][layer])
-            agg_weights.append(sum(var))
-
-        # reset weights and samples for next round
-        self.weights = []
-        self.trainer_samples = []
-
-        return agg_weights
-    
-    def plot_training_metrics(self):
-        fig, ax = plt.subplots(1, 1)
-        x = self.mean_acc_per_round
-        y = np.arange(len(x)) + 1
-        plt.plot([str(s) for s in y], x)
-        plt.annotate('%0.3f' % x[-1], xy=(1, x[-1]), xytext=(8, 0), 
-                    xycoords=('axes fraction', 'data'), textcoords='offset points')
-        plt.xlabel('rounds')
-        plt.ylabel('accuracy')
-        plt.title(f'simulation using num_rounds={len(x)}')
-        plt.savefig(f'./simulation-rounds={len(x)}.png', dpi=600)
-        plt.close(fig)
-
-
