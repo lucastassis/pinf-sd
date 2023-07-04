@@ -46,16 +46,18 @@ def on_connect(client, userdata, flags, rc):
     client.subscribe(f'sd/trab42/aggregation_server/aggregated')
     client.subscribe(f'sd/trab42/aggregation_server/mean_accuracy')
 
-
+# register new clients on client list
 def on_message_init(client, userdata, message):
     m = json.loads(message.payload.decode("utf-8"))
     trainer.add_new_client(m['id'])
 
+# register clients votes
 def on_message_voting(client, userdata, message):
     m = json.loads(message.payload.decode("utf-8"))
     trainer.add_client_vote(m)
 
 # trainer callbacks
+# train model if selected for training
 def on_message_selection(client, userdata, message):
     if not trainer.is_leader():
         m = json.loads(message.payload.decode("utf-8"))
@@ -70,6 +72,7 @@ def on_message_selection(client, userdata, message):
             print(color.BOLD_START + 'new round starting' + color.BOLD_END)
             print(f'trainer was not selected for training this round')
 
+# update aggregated weights and compute accuracy on round
 def on_message_aggregation(client, userdata, message):
     if not trainer.is_leader():
         m = json.loads(message.payload.decode("utf-8"))
@@ -80,12 +83,14 @@ def on_message_aggregation(client, userdata, message):
         print(f'sending eval metrics!\n')
         client.publish(f'sd/trab42/group={GROUP_NUM}/evaluation', r)
 
+# finish process
 def on_message_finish(client, userdata, message):
     if not trainer.is_leader():
         trainer.set_stop_true()
         exit()
 
 # leader callbacks
+# receive weights from trainers and add to list
 def on_message_round(client, userdata, message):
     if trainer.is_leader():
         m = json.loads(message.payload.decode("utf-8"))
@@ -95,18 +100,21 @@ def on_message_round(client, userdata, message):
         trainer.update_num_responses()
         print(f'received weights from trainer {m["id"]}!')
 
+# receive accuracy from trainers and add to list
 def on_message_evaluation(client, userdata, message):
     if trainer.is_leader():
         m = json.loads(message.payload.decode("utf-8"))
         trainer.add_accuracy(m['accuracy'])
         trainer.update_num_responses()
 
+# receive aggregated weights from central server and send to trainers
 def on_message_server_aggregated(client, userdata, message):
     if trainer.is_leader():
         m = json.loads(message.payload.decode("utf-8"))
         response = json.dumps({'weights' : m['weights']})
         client.publish(f'sd/trab42/group={GROUP_NUM}/aggregation', response)
 
+# receive mean accuracy from central server
 def on_message_server_mean_accuracy(client, userdata, message):
     if trainer.is_leader():
         m = json.loads(message.payload.decode("utf-8"))
@@ -185,7 +193,7 @@ if trainer.is_leader():
 
         # send weights to aggregation server
         # agg_weights = trainer.agg_weights()
-        response = json.dumps({'weights' : trainer.get_weight_list(), 'num_samples' : trainer.get_trainer_samples_list()})
+        response = json.dumps({'weights' : trainer.get_weight_list(), 'num_samples' : trainer.get_trainer_samples_list(), 'group' : GROUP_NUM})
         client.publish(f'sd/trab42/aggregation_server/aggregation', response)
         print(f'sent aggregated weights to aggregation server!')
         trainer.reset_weight_list()
