@@ -2,6 +2,11 @@ import random
 import json
 import hashlib
 import queue
+from cryptography.hazmat.primitives.asymmetric import rsa
+from cryptography.hazmat.primitives import serialization
+from cryptography.hazmat.primitives import hashes
+from cryptography.hazmat.primitives.asymmetric import padding
+from cryptography.exceptions import InvalidSignature
 
 # From https://codereview.stackexchange.com/a/260276
 def str_bin_in_4digits(hex_string: str) -> str:
@@ -23,6 +28,11 @@ class Node():
         self._is_leader = False
         self._is_solved = False
         self.challenge = 0
+
+        # cryptography
+        self.private_key = rsa.generate_private_key(public_exponent=65537, key_size=1024)
+        self.public_key = self.private_key.public_key()
+        self.node_keys = {str(self.id) : self.public_key}
 
     # getters and setters
     def get_id(self):
@@ -51,8 +61,8 @@ class Node():
             self.node_list.append(new_id)
     
     def add_node_voting(self, vote):
-        self.voter_list.update({vote['ClientID'] : vote['VoteID']})
-    
+        self.voter_list.update({vote['NodeID'] : vote['VoteID']})
+
     # ops
     def election(self):
         winner = max(self.voter_list, key=self.voter_list.get)
@@ -81,4 +91,53 @@ class Node():
                 self._is_solved = True
                 return True
         else:
+            return False
+    
+
+    # cryptography
+    def get_public_key_hex(self):
+        print(self.public_key.public_bytes(
+                    encoding=serialization.Encoding.PEM,
+                    format=serialization.PublicFormat.SubjectPublicKeyInfo
+                    ))
+        return self.public_key.public_bytes(
+                    encoding=serialization.Encoding.PEM,
+                    format=serialization.PublicFormat.SubjectPublicKeyInfo
+                    ).hex()
+
+    def get_node_keys(self):
+        return self.node_keys
+
+    def get_num_keys(self):
+        return len(self.node_keys)
+
+    def add_node_key(self, node_id, pubkey):
+        self.node_keys[node_id] = pubkey
+    
+    def sign_message(self, message):
+        signature = self.private_key.sign(
+            message,
+            padding.PSS(
+                mgf=padding.MGF1(hashes.SHA256()),
+                salt_length=padding.PSS.MAX_LENGTH
+            ),
+            hashes.SHA256()
+        )
+        return signature
+    
+    def verify_signature(self, node_id, message, signature):
+        try:
+            self.node_keys[node_id].verify(
+                signature,
+                message,
+                padding.PSS(
+                    mgf=padding.MGF1(hashes.SHA256()),
+                    salt_length=padding.PSS.MAX_LENGTH
+                ),
+                hashes.SHA256()
+            )
+            print(f'valid signature from node {node_id}')
+            return True
+        except InvalidSignature:
+            print(f'invalid signature from node {node_id}')
             return False
