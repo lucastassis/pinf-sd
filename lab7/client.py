@@ -102,12 +102,12 @@ client.message_callback_add('sd/42/cert', on_message_cert)
 
 # start client loop
 client.loop_start()
+
 # publish on init and wait
 while node.get_num_nodes() != N:
     m = json.dumps({'NodeID' : node.get_id()})
     client.publish('sd/42/init', m)
     time.sleep(1)
-
 # send m again to avoid deadlocks on "late clients"
 m = json.dumps({'NodeID' : node.get_id()})
 client.publish('sd/42/init', m)
@@ -131,7 +131,7 @@ while node.get_num_voters() != N:
 
 # election
 node.election()
-
+time.sleep(2)
 # create challenge if leader, solve if not
 if node.is_leader():
     # publish challenge

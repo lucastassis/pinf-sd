@@ -131,7 +131,7 @@ while node.get_num_voters() != N:
 
 # election
 node.election()
-
+time.sleep(2)
 # create challenge if leader, solve if not
 if node.is_leader():
     # publish challenge

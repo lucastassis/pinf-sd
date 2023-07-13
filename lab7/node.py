@@ -78,7 +78,7 @@ class Node():
             print(f'I\'m a node!')
     
     def create_challenge(self):
-        self.challenge = random.randint(10, 20)
+        self.challenge = random.randint(10, 25)
         print(f'Created challenge {self.challenge}')
         signature_data = bytes(str(self.challenge), 'utf-8')
         signature = self.sign_message(signature_data).hex()
