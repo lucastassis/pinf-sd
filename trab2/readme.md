@@ -67,11 +67,35 @@ O líder no começo de cada round faz uma escolha aleatória do número mínimo 
 
 Uma vez que os os líderes recebem os pesos agregados, eles passam para todos os treinadores (inclusive os que não treinaram). Esse envio é feito pela mensagem `{'weights' : list}` na fila **sd/trab42/group=GROUP_NUM/aggregation** (note que é diferente da fila que envia para o server central). . Os clientes recebem e fazem a atualização dos seus pesos locais. Ao atualizar, cada um dos clientes faz a validação dos novos pesos em sua base de teste local, e envia a mensagem `{'id' : int, 'accuracy' : float}` na fila **sd/trab42/group=GROUP_NUM/evaluation**. Ao receber a acurácia de todos os treinadores, o líder de cada grupo envia a mensagem com a lista de acurácias para o servidor central, para que seja computada a média de acurácia considerando os dois grupos. Essa mensagem é enviada para a fila **sd/trab42/aggregation_server/evaluation**, contendo `{accuracy_list : list}`.  O servidor central por sua vez, ao receber a mensagem de todos os grupos, computa a média e envia para os líderes com a mensagem `{'mean_accuracy' : float}`, para a fila **sd/trab42/aggregation_server/mean_accuracy**.
 
-Os líderes verificam se já chegou no limite escolhido no início do treinamento, caso tenha passado o threshold, ele envia uma mensagem `{'stop' : bool}` para a fila **sd/trab42/group=GROUP_NUM/finish **indicando para os clientes terminarem o processo. Caso contrário, um novo round é inicializado, e o processo é repetido. Caso o modelo nunca alcance o limite de acurácia, ele irá parar com a mesma mensagem ao chegar no número máximo de rounds. Note que o servidor central também faz a verificação do limite de acurácia/número de rounds em seu próprio processo (por isso são passados como parâmetro ao inicializar o servidor central).
+Os líderes verificam se já chegou no limite escolhido no início do treinamento, caso tenha passado o threshold, ele envia uma mensagem `{'stop' : bool}` para a fila **sd/trab42/group=GROUP_NUM/finish** indicando para os clientes terminarem o processo. Caso contrário, um novo round é inicializado, e o processo é repetido. Caso o modelo nunca alcance o limite de acurácia, ele irá parar com a mesma mensagem ao chegar no número máximo de rounds. Note que o servidor central também faz a verificação do limite de acurácia/número de rounds em seu próprio processo (por isso são passados como parâmetro ao inicializar o servidor central).
 
 No final do treinamento também é gerado um plot com a acurácia ao longo dos rounds!
 
+Obs.: Assim como no primeiro trabalho, ao incializar os clientes também é feito o *sampling* de sua base local para treinamento dos modelos. É feito um *sampling* aleatório de `10000 < num_samples < 20000` na base MNIST para servir como sua base de treino. Já para a base de teste, é feito um *sampling* de 3000 exemplos (~1/3 da base de teste) em todos os clientes.  Note que esse processo acaba permitindo que mais de um cliente tenha exemplos repetidos, mas como o tratamento disso não era interessante para/no escopo desse trabalho em específico, foi utilizado dessa forma.
+
 ## Exemplo de experimento e resultado
+
+Para experimentar, utilizamos alguns setups diferentes como no primeiro trabalho e no laboratório 2 (utilizando a biblioteca `flower`) . Para exemplificar iremos mostrar experimentos com número de rounds igual 10 (e sem threshold de acurácia, para que sejam feito todos os rounds). Foram utilizados 4 clientes em cada grupo (e todos os 3 treinando em todos os rounds) e cada modelo treinou 10 épocas. As figuras abaixo apresentam os resultados obtidos. Para reproduzir esse experimento basta utilizar o comando: `python client.py localhost 4 3 10 1 1` para os treinadores do grupo 1; `python client.py localhost 4 3 10 1 2` para os treinadores do grupo 2; e `python server.py localhost 2 10 1` para inicializar o servidor central.
+
+Primeiro podemos apresentar um exemplo do sistema funcionando e o plot dos terminais após a eleição (com os prints de coordenação/eleição):
+
+<img src="figs/election.png" width="800"/>
+
+Por fim, podemos apresentar o resultado obtido no experimento:
+
+<img src="figs/simulation-rounds=10.png" width="800"/>
+
+Pode-se observar que o modelo chegou em uma acurácia ~0.98 no segundo round. Como a base MNIST é uma base *toy*, é possível obter resultados com um menor número de rounds nela, como analisado no laboratório 2 e no primeiro trabalho. Para comparação, a figura abaixo apresenta o plot para 10 rounds utilizando o `flower`:
+
+<img src="figs/flower-simulation-rounds=10.png" width="800"/>
+
+E a figura abaixo apresenta o plot para 10 rounds no trabalho 1:
+
+<img src="figs/trab1-simulation-rounds=10.png" width="800"/>
+
+Notamos que o modelo `flower` obteve um resultado melhor no primeiro round, e um resultado bem semelhante do trabalho 1. Assim como no primeiro trabalho, esse primeiro resultado pior pode ter sido por conta de alguma diferença de *sampling* dos dados de treinamento/ruído no treinamento da rede (em outros testes o primeiro round deu um resultado melhor, e em alguns outros semelhante ao apresentado). E também, a convergência foi mais rápida que a da biblioteca `flower`, mas que novamente pode ser só parte da aleatoriedade no treinamento da rede ao longo dos rounds ou *sampling* dos dados de treinamento/teste.
+
+De qualquer forma, o fato mais importante é que houve aprendizado e convergência em nossa implementação e com esses resultados acreditamos que a performance foi satisfatória no problema.
 
 ## Conclusão
 

@@ -21,7 +21,7 @@ n = len(sys.argv)
  
 # check args
 if (n != 7):
-    print("correct use: python server.py <broker_address> <min_clients> <clients_per_round> <num_rounds> <accuracy_threshold> <group_number>.")
+    print("correct use: python client.py <broker_address> <min_clients> <clients_per_round> <num_rounds> <accuracy_threshold> <group_number>.")
     exit()
 
 BROKER_ADDR = sys.argv[1]
@@ -35,13 +35,10 @@ GROUP_NUM = int(sys.argv[6])
 def on_connect(client, userdata, flags, rc):
     client.subscribe(f'sd/trab42/group={GROUP_NUM}/init')
     client.subscribe(f'sd/trab42/group={GROUP_NUM}/election')
-    # trainer
+    # trainer (not after election to avoid deadlocks)
     client.subscribe(f'sd/trab42/group={GROUP_NUM}/selection')
     client.subscribe(f'sd/trab42/group={GROUP_NUM}/aggregation')
     client.subscribe(f'sd/trab42/group={GROUP_NUM}/finish')
-    # leader
-    client.subscribe(f'sd/trab42/group={GROUP_NUM}/round')
-    client.subscribe(f'sd/trab42/group={GROUP_NUM}/evaluation')
     # aggregation server
     client.subscribe(f'sd/trab42/aggregation_server/aggregated')
     client.subscribe(f'sd/trab42/aggregation_server/mean_accuracy')
@@ -176,6 +173,11 @@ if not trainer.is_leader():
 # --------------- leader loop --------------- #
 if trainer.is_leader():
     time.sleep(2) # for sync purposes
+    
+    # subscribe to leader queues
+    client.subscribe(f'sd/trab42/group={GROUP_NUM}/round')
+    client.subscribe(f'sd/trab42/group={GROUP_NUM}/evaluation')
+
     while trainer.get_current_round() != NUM_ROUNDS:
         trainer.update_current_round()
         print(color.RESET + '\n' + color.BOLD_START + f'starting round {trainer.get_current_round()}' + color.BOLD_END)
