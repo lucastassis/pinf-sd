@@ -1,6 +1,6 @@
 # Trabalho II - Aprendizado Federado Descentralizado
 
-[Link para o vídeo de apresentação (passou um pouco do tempo por conta da simulação : ) )]()
+[Link para o vídeo de apresentação (passou um pouco do tempo de 3min por conta da simulação : ) )](https://drive.google.com/file/d/1wGZaxxJqIYRmmYM7IzpUW12jt34D8_9V/view?usp=sharing)
 
 ## Integrantes do grupo
 2022132020 - Mestrado - Breno Aguiar Krohling
