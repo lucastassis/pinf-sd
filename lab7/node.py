@@ -20,11 +20,15 @@ def str_bin_in_4digits(hex_string: str) -> str:
     return f"{int(hex_string,16):0{len(hex_string)*5-1}_b}".replace('_', '')
 
 class Node():
-    def __init__(self):
+    def __init__(self, malicious=False):
         self.id = random.getrandbits(32)
         self.node_list = [self.id]
+        self.malicious = malicious
         self.vote = random.getrandbits(32)
         self.voter_list = {str(self.id) : self.vote}
+        if self.malicious:
+            self.vote = 1
+            self.voter_list = {str(self.id) : 1}
         self._is_leader = False
         self._is_solved = False
         self.challenge = 0
@@ -76,14 +80,24 @@ class Node():
     def create_challenge(self):
         self.challenge = random.randint(10, 20)
         print(f'Created challenge {self.challenge}')
-        return json.dumps({'Challenge' : self.challenge})
+        signature_data = bytes(str(self.challenge), 'utf-8')
+        signature = self.sign_message(signature_data).hex()
+        return json.dumps({'NodeID': str(self.id), 'Challenge' : self.challenge, 'Signature': signature})
 
     def solve_challenge(self, challenge):
-        while True:
-            key = random.randint(0, 2**32)
+        if not self.malicious:
+            while True:
+                key = random.randint(0, 2**32)
+                solution = str_bin_in_4digits(hashlib.sha1(str(key).encode()).hexdigest())
+                if solution[:challenge] == challenge * '0':
+                    return str(key)
+        elif self.malicious:
+            # generate public key again to simulate malicious node
+            self.private_key = rsa.generate_private_key(public_exponent=65537, key_size=1024)
+            self.public_key = self.private_key.public_key()
+            key = 1
             solution = str_bin_in_4digits(hashlib.sha1(str(key).encode()).hexdigest())
-            if solution[:challenge] == challenge * '0':
-                return str(key)
+            return str(key)
     
     def check_solution(self, key):
         solution = str_bin_in_4digits(hashlib.sha1(str(key).encode()).hexdigest())
@@ -96,10 +110,6 @@ class Node():
 
     # cryptography
     def get_public_key_hex(self):
-        print(self.public_key.public_bytes(
-                    encoding=serialization.Encoding.PEM,
-                    format=serialization.PublicFormat.SubjectPublicKeyInfo
-                    ))
         return self.public_key.public_bytes(
                     encoding=serialization.Encoding.PEM,
                     format=serialization.PublicFormat.SubjectPublicKeyInfo
@@ -136,7 +146,6 @@ class Node():
                 ),
                 hashes.SHA256()
             )
-            print(f'valid signature from node {node_id}')
             return True
         except InvalidSignature:
             print(f'invalid signature from node {node_id}')

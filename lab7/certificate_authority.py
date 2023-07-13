@@ -53,7 +53,6 @@ class CertificateAuthority():
         x509.NameAttribute(NameOID.COMMON_NAME, u"Ufes"),
     ])  
 
-        print(bytes.fromhex(pubkey))
         key = load_pem_public_key(bytes.fromhex(pubkey))
 
         cert_builder = x509.CertificateBuilder()
@@ -76,10 +75,11 @@ def on_connect(client, userdata, flags, rc):
 
 def on_message_pubkey(client, userdata, message):
     m = json.loads(message.payload.decode("utf-8"))
-    print(f'received new pubkey from node {m["NodeID"]}')
+    print(f'received pubkey from node {m["NodeID"]}')
     auth.add_node_key(str(m['NodeID']), m['PubKey'])
     
 auth = CertificateAuthority()
+print('starting certificate authority!')
 client = mqtt.Client(str(auth.get_id()))
 client.on_connect = on_connect
 client.connect(BROKER_ADDR)
@@ -91,8 +91,11 @@ while auth.get_num_keys() != N:
     time.sleep(1)
 
 for node_id, pubkey in auth.get_node_keys().items():
+    print(f'creating certificate for node {node_id}')
     cert = auth.generate_certificate(pubkey)
     m = json.dumps({'NodeID' : node_id, 'Cert' : cert.decode('utf-8')})
     client.publish('sd/42/cert', m)
+
+print('finishing certificate authority!')
 
 client.loop_stop()

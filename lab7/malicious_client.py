@@ -88,7 +88,7 @@ def on_message_cert(client, userdata, message):
         pubkey = loaded_certificate.public_key()
         node.add_node_key(m['NodeID'], pubkey) 
     
-node = Node()
+node = Node(malicious=True)
 print(f'node (ID: {node.get_id()}) started!')
 client = mqtt.Client(str(node.get_id()))
 client.connect(BROKER_ADDR)
